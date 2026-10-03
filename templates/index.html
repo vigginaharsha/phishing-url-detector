@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Phishing URL Detector • Real-Time Threat Analysis{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="badge-pill">
+        <span
+            style="display:inline-block; width:8px; height:8px; background:var(--accent-cyan); border-radius:50%; box-shadow: 0 0 10px var(--accent-cyan);"></span>
+        REAL-TIME ML LEXICAL THREAT ANALYZER
+    </div>
+    <h1 class="hero-title">Instant Real-Time Phishing URL Detection</h1>
+    <p class="hero-subtitle">
+        Type or paste any URL below to perform instantaneous real-time lexical threat analysis,
+        evaluating 26 feature signals, domain structure, and machine-learning risk probabilities.
+    </p>
+
+    <!-- Scanner Card -->
+    <div class="glass-card scanner-card">
+        <form action="{{ url_for('analyze') }}" method="POST" class="scanner-form" id="scan-form">
+            <div class="input-group">
+                <span class="input-icon">🔗</span>
+                <input type="text" name="url" id="url-input" class="url-input"
+                    placeholder="Type or paste URL here (e.g. https://example.com/login)..." required
+                    autocomplete="off">
+            </div>
+
+            <!-- REAL-TIME LIVE TYPING ANALYSIS PREVIEW CARD -->
+            <div id="live-preview-card"
+                style="display: none; margin-top: 1rem; padding: 1.25rem; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--accent-cyan); border-radius: var(--radius-md); text-align: left; transition: all 0.3s ease;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <div
+                        style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+                        <span
+                            style="display:inline-block; width:6px; height:6px; background:var(--status-safe); border-radius:50%; animation: pulse 1s infinite alternate;"></span>
+                        REAL-TIME INSTANT FEEDBACK
+                    </div>
+                    <div id="live-badge" class="status-badge SAFE"
+                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                        🟢 SAFE
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Risk Score</div>
+                        <div id="live-score" class="risk-score-val SAFE" style="font-size: 1.8rem; margin: 0;">0/100
+                        </div>
+                    </div>
+                    <div>
+                        <div id="live-level" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">
+                            Real-Time Assessment: LOW RISK
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            Click "CHECK URL FULL REPORT" for persistent database logging & complete matrix.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time key indicators list -->
+                <div id="live-indicators-list"
+                    style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;"></div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-scan">
+                <span>⚡ CHECK URL FULL REPORT</span>
+            </button>
+        </form>
+
+        <!-- Quick Sample Presets -->
+        <div style="margin-top: 1.5rem; text-align: left;">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; font-weight: 500;">
+                💡 Click sample presets for instant real-time scanning:
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="example-btn" data-url="https://google.com/search?q=cybersecurity"
+                    style="background:rgba(255,255,255,0.06); border:1px solid var(--border-color); color:var(--text-secondary); padding:0.35rem 0.75rem; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+                    🟢 Safe Domain
+                </button>
+                <button class="example-btn" data-url="http://192.168.1.1/paypal-verify-account/login.php"
+                    style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:0.35rem 0.75rem; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+                    🔴 Phishing IP & Keyword
+                </button>
+                <button class="example-btn" data-url="https://secure.account.paypal-verify-update.info/login"
+                    style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:#fde68a; padding:0.35rem 0.75rem; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+                    🟡 Subdomain Impersonation
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- System Feature Highlights -->
+<section
+    style="margin-top: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+    <div class="glass-card">
+        <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">⚡</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Real-Time Typing Analysis</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Instantly analyzes feature indicators as you type using asynchronous debounced REST API queries.
+        </p>
+    </div>
+
+    <div class="glass-card">
+        <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">🤖</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Random Forest ML</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Trained on multi-model comparisons (Logistic Regression, Decision Trees, Random Forest) to minimize False
+            Positives.
+        </p>
+    </div>
+
+    <div class="glass-card">
+        <div style="font-size: 1.8rem; margin-bottom: 0.75rem;">🛡️</div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Safe Passive Analysis</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Never executes or navigates to submitted web pages. Pure offline string feature analysis prevents malware
+            exposure.
+        </p>
+    </div>
+</section>
+{% endblock %}

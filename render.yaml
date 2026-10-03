@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: phishing-url-detector
+    env: python
+    buildCommand: "pip install -r requirements.txt && python src/train_model.py"
+    startCommand: "gunicorn wsgi:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: SECRET_KEY
+        generateValue: true

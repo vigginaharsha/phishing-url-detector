@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan Result • {{ result.prediction }} ({{ result.risk_score }}/100){% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Top Action Nav -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <a href="{{ url_for('index') }}"
+            style="color: var(--accent-cyan); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 0.4rem;">
+            ← Scan Another URL
+        </a>
+        <a href="{{ url_for('dashboard') }}"
+            style="color: var(--text-secondary); text-decoration: none; font-weight: 500;">
+            View Scan Dashboard →
+        </a>
+    </div>
+
+    <!-- Main Results Glass Card -->
+    <div class="glass-card">
+
+        <!-- Result Header Grid -->
+        <div class="result-header">
+            <div>
+                <p
+                    style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.4rem;">
+                    Scanned URL Target
+                </p>
+                <div class="url-box">
+                    {{ result.url }}
+                </div>
+
+                <div style="margin-top: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                    <div class="status-badge {{ result.prediction }}">
+                        {% if result.prediction == 'SAFE' %}🟢 SAFE{% elif result.prediction == 'SUSPICIOUS' %}🟡
+                        SUSPICIOUS{% else %}🔴 PHISHING{% endif %}
+                    </div>
+                    <span style="font-weight: 600; color: var(--text-secondary); font-size: 0.95rem;">
+                        Risk Level: {{ result.risk_level }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Risk Score Gauge Box -->
+            <div class="risk-card">
+                <p
+                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">
+                    Threat Risk Score
+                </p>
+                <div class="risk-score-val {{ result.prediction }}">
+                    {{ result.risk_score }}
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                    Out of 100 maximum risk scale
+                </p>
+            </div>
+        </div>
+
+        <!-- Explanation Indicators Section -->
+        <div style="margin-top: 2.5rem;">
+            <h3
+                style="font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1rem;">
+                🛡️ Security Reason & Indicator Breakdown
+            </h3>
+
+            <div class="indicators-grid">
+                {% for ind in result.indicators %}
+                <div class="indicator-card {{ ind.status }}">
+                    <div class="indicator-icon">{{ ind.icon }}</div>
+                    <div>
+                        <div class="indicator-title">{{ ind.title }}</div>
+                        <div class="indicator-desc">{{ ind.description }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Raw Feature Extraction Matrix -->
+        <div style="margin-top: 2.5rem;">
+            <h3
+                style="font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1rem;">
+                ⚙️ Extracted Lexical Features Matrix
+            </h3>
+            <div style="overflow-x: auto;">
+                <table class="features-table">
+                    <thead>
+                        <tr>
+                            <th>Feature Name</th>
+                            <th>Extracted Value</th>
+                            <th>Feature Explanation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>url_length</code></td>
+                            <td><strong>{{ result.features.url_length }}</strong></td>
+                            <td>Total character length of URL string</td>
+                        </tr>
+                        <tr>
+                            <td><code>domain_length</code></td>
+                            <td><strong>{{ result.features.domain_length }}</strong></td>
+                            <td>Host/Domain string length</td>
+                        </tr>
+                        <tr>
+                            <td><code>num_subdomains</code></td>
+                            <td><strong>{{ result.features.num_subdomains }}</strong></td>
+                            <td>Count of subdomains (e.g. sub1.sub2.domain.com)</td>
+                        </tr>
+                        <tr>
+                            <td><code>has_ip</code></td>
+                            <td><strong>{{ result.features.has_ip }}</strong></td>
+                            <td>1 if domain is raw IP address, else 0</td>
+                        </tr>
+                        <tr>
+                            <td><code>has_at_symbol</code></td>
+                            <td><strong>{{ result.features.has_at_symbol }}</strong></td>
+                            <td>1 if '@' redirection symbol present, else 0</td>
+                        </tr>
+                        <tr>
+                            <td><code>suspicious_keyword_count</code></td>
+                            <td><strong>{{ result.features.suspicious_keyword_count }}</strong></td>
+                            <td>Count of phishing target keywords matched</td>
+                        </tr>
+                        <tr>
+                            <td><code>digit_ratio</code></td>
+                            <td><strong>{{ (result.features.digit_ratio * 100)|round(1) }}%</strong></td>
+                            <td>Ratio of numeric digits to total URL length</td>
+                        </tr>
+                        <tr>
+                            <td><code>special_char_ratio</code></td>
+                            <td><strong>{{ (result.features.special_char_ratio * 100)|round(1) }}%</strong></td>
+                            <td>Ratio of special characters to total URL length</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}ML Model Insights & Comparison{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">🧠 Machine Learning Model Insights</h1>
+    <p style="color: var(--text-secondary);">Model comparison, evaluation metrics, and feature importance rankings.</p>
+</div>
+
+{% if report %}
+<!-- Best Model Overview Banner -->
+<div class="glass-card" style="margin-bottom: 2rem; border-color: var(--accent-cyan);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <span class="badge-pill">ACTIVE PRODUCTION MODEL</span>
+            <h2 style="font-size: 1.8rem; margin-top: 0.4rem;">Selected Champion: <span
+                    style="color: var(--accent-cyan);">{{ report.best_model }}</span></h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Automatically selected based on highest
+                cross-validation F1-Score to optimize detection balance.</p>
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+            {% set best = report.all_models[report.best_model] %}
+            <div style="text-align: center;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Accuracy</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--status-safe);">{{ (best.accuracy *
+                    100)|round(2) }}%</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Precision</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-cyan);">{{ (best.precision *
+                    100)|round(2) }}%</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Recall</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--status-suspicious);">{{ (best.recall *
+                    100)|round(2) }}%</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">F1 Score</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-purple);">{{ (best.f1_score *
+                    100)|round(2) }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Multi-Model Comparison Table -->
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">📊 Candidate Model Benchmark Comparison</h3>
+    <div style="overflow-x: auto;">
+        <table class="features-table">
+            <thead>
+                <tr>
+                    <th>Model Architecture</th>
+                    <th>Accuracy</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1 Score</th>
+                    <th>ROC-AUC</th>
+                    <th>Selection Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for model_name, metrics in report.all_models.items() %}
+                <tr {% if model_name==report.best_model %}style="background: rgba(0, 242, 254, 0.05);" {% endif %}>
+                    <td><strong>{{ model_name }}</strong></td>
+                    <td>{{ (metrics.accuracy * 100)|round(2) }}%</td>
+                    <td>{{ (metrics.precision * 100)|round(2) }}%</td>
+                    <td>{{ (metrics.recall * 100)|round(2) }}%</td>
+                    <td><strong>{{ (metrics.f1_score * 100)|round(2) }}%</strong></td>
+                    <td>{{ metrics.roc_auc }}</td>
+                    <td>
+                        {% if model_name == report.best_model %}
+                        <span class="status-badge SAFE" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">🏆
+                            Winner</span>
+                        {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Evaluated</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Top Feature Importances & Cyber Viva Explanation -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <!-- Feature Importance Ranking -->
+    <div class="glass-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">🔥 Top Model Feature Importances</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for feature, importance in report.feature_importances.items() %}
+            {% if loop.index <= 8 %} <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.2rem;">
+                    <code>{{ feature }}</code>
+                    <span style="color: var(--accent-cyan); font-weight: 600;">{{ (importance * 100)|round(1) }}%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.06); height: 6px; border-radius: 3px; overflow: hidden;">
+                    <div
+                        style="background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); height: 100%; width: {{ (importance * 100) }}%;">
+                    </div>
+                </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- College Viva Explanation Box -->
+<div class="glass-card" style="background: rgba(15, 23, 42, 0.9);">
+    <h3 style="font-size: 1.1rem; color: var(--status-suspicious); margin-bottom: 0.75rem;">
+        🎓 Cybersecurity Concept: Precision vs Recall
+    </h3>
+    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+        In Phishing Detection, <strong>Accuracy alone is misleading</strong> due to class distributions and safety
+        tradeoffs.
+    </p>
+    <ul
+        style="font-size: 0.85rem; color: var(--text-secondary); padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        <li>
+            <strong style="color: var(--accent-cyan);">Precision (FP control):</strong> Measures what percentage of URLs
+            flagged as phishing were truly malicious. Low precision causes legitimate business domains to be blocked.
+        </li>
+        <li>
+            <strong style="color: var(--status-phishing);">Recall (FN control):</strong> Measures what percentage of
+            actual phishing URLs were caught by the model. Low recall lets phishing attacks bypass detection into user
+            inboxes!
+        </li>
+    </ul>
+</div>
+</div>
+
+{% else %}
+<div class="glass-card" style="text-align: center; padding: 3rem;">
+    <h2>⚠️ No Trained Model Metrics Found</h2>
+    <p style="color: var(--text-secondary); margin: 1rem 0;">Run model training script to generate comparison reports:
+    </p>
+    <code
+        style="background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 6px; color: var(--accent-cyan);">python src/train_model.py</code>
+</div>
+{% endif %}
+{% endblock %}

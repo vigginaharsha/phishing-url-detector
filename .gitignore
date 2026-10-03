@@ -1,0 +1,29 @@
+# Python Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Database files
+scans.db
+*.sqlite3
+instance/
+
+# OS / IDE generated files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Saved models (keep dir, gitignore heavy binaries if needed, or track small pkl)
+models/*.pkl
+!models/.gitkeep
+
+# Temporary / test files
+.pytest_cache/
+*.log

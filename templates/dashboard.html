@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan Dashboard • SQLite Analytics{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">📊 Scan Analytics Dashboard</h1>
+    <p style="color: var(--text-secondary);">Real-time metrics and historical database record of analyzed URLs.</p>
+</div>
+
+<!-- Stat Cards Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
+            Total URLs Analyzed</div>
+        <div class="stat-number" style="color: var(--accent-cyan);">{{ stats.total }}</div>
+    </div>
+    <div class="stat-card">
+        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Safe
+            URLs (Low Risk)</div>
+        <div class="stat-number" style="color: var(--status-safe);">{{ stats.safe }}</div>
+    </div>
+    <div class="stat-card">
+        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
+            Suspicious URLs</div>
+        <div class="stat-number" style="color: var(--status-suspicious);">{{ stats.suspicious }}</div>
+    </div>
+    <div class="stat-card">
+        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">
+            Phishing Threats</div>
+        <div class="stat-number" style="color: var(--status-phishing);">{{ stats.phishing }}</div>
+    </div>
+</div>
+
+<!-- Chart & Insights Section -->
+<div style="display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+    <!-- Donut Chart Card -->
+    <div class="glass-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Risk Class Distribution</h3>
+        <div style="height: 230px; position: relative;">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Quick Info Banner -->
+    <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center;">
+        <h3 style="font-size: 1.2rem; color: var(--accent-cyan); margin-bottom: 0.75rem;">🛡️ Database Integrity &
+            Privacy</h3>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem;">
+            All historical scans are recorded in a local, lightweight <code>SQLite</code> database
+            (<code>scans.db</code>).
+            The detector only stores the URL string, timestamp, numerical risk score, and detected indicators.
+            No user credentials, cookies, IP trackers, or personal information are logged.
+        </p>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn-scan"
+                style="display: inline-flex; padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+                + Scan New URL
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- SQLite Scan History Table -->
+<div class="glass-card">
+    <h3
+        style="font-size: 1.2rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <span>📜 Recent Scan History</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;">Stored in SQLite</span>
+    </h3>
+
+    {% if recent_scans %}
+    <div style="overflow-x: auto;">
+        <table class="features-table">
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Scanned URL Target</th>
+                    <th>Prediction</th>
+                    <th>Risk Score</th>
+                    <th>Scanned At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in recent_scans %}
+                <tr>
+                    <td><code>#{{ scan.id }}</code></td>
+                    <td
+                        style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ scan.url }}
+                    </td>
+                    <td>
+                        <span class="status-badge {{ scan.prediction }}"
+                            style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                            {{ scan.prediction }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong class="risk-score-val {{ scan.prediction }}" style="font-size: 1rem;">
+                            {{ scan.risk_score }}/100
+                        </strong>
+                    </td>
+                    <td style="color: var(--text-secondary); font-size: 0.85rem;">
+                        {{ scan.scanned_at }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        No scans logged in SQLite database yet. Return to home page to perform your first URL scan!
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('riskDistributionChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Safe', 'Suspicious', 'Phishing'],
+                    datasets: [{
+                        data: [{{ stats.safe }}, {{ stats.suspicious }}, {{ stats.phishing }}],
+        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderColor: '#0f172a',
+                borderWidth: 3
+    }]
+            },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#94a3b8', font: { family: 'Outfit', size: 12 } }
+            }
+        }
+    }
+        });
+    }
+});
+</script>
+{% endblock %}
